@@ -1,8 +1,6 @@
 #ifndef __FATALERROR__H__
 #define __FATALERROR__H__
 
-
-#include "logger.hpp"
 #include "tools.hpp"
 class FatalError{
     public:
@@ -31,6 +29,5 @@ class GameTypeNotValid: public FatalError{
             fatal("Game Type In The Input Puzzle FIle Is Not Valid\n");
         }
 };
-
 
 #endif  //!__FATALERROR__H__

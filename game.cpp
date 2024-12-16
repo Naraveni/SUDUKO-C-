@@ -4,8 +4,9 @@ Game::Game(ifstream& in): inputFile(in) {
     //valid game types
     undo = new Stack();
     redo = new Stack();
+    int n=9;
     Frame* frame;
-    string validGameType = "TtDdSs";
+    const string validGameType = "TtDdSs";
     inputFile >> gameType;
     try{
         if(validGameType.find(gameType) == string::npos) throw GameTypeNotValid();;     
@@ -17,8 +18,9 @@ Game::Game(ifstream& in): inputFile(in) {
         }
         else{
             board = new SixyBoard(inputFile);
+            n=6;
         }
-        fancyView =  new Viewer(9, 9, *board);
+        fancyView =  new Viewer(n, n, *board);
         fancyView->show(cout);
     }
     catch(InvalidInputFile e){
@@ -34,14 +36,12 @@ Game::Game(ifstream& in): inputFile(in) {
 
 void Game::run(){
     //stores valid menu choices
-    string validMenuChoice = "MmUuRrSsXxQqTt";
+    const string validMenuChoice = "MmUuRrSsXxQqTt";
     char choice;
     Frame* frame;
-
     //loop to keep asking the user for input after every operation unitl he chooses to exit
     while(true){    
         choice = menu_c("Please Select The Action From The Below Menu: ",7,menu,validMenuChoice);
-
         switch(choice){
             case 'm':
             case 'M':
@@ -83,7 +83,17 @@ void Game::run(){
                 Logger::getStream() << *board;
                 fancyView->show(cout);
                 break;
-
+            }
+            case 's':
+            case 'S':{
+                board->save();
+                break;
+            }
+            case 'x':
+            case 'X':{
+                board->restoreFromSave();
+                fancyView->show(cout);
+                break;
             }
             case 'Q':
             case 'q':{
@@ -96,7 +106,6 @@ void Game::run(){
         }
     }  
 }
-
 
 //performs undo operation
 void Game::perUndo(){
@@ -131,7 +140,6 @@ void Game::perRedo(){
         e.print();
     }
 }
-
 
 //deletes the frames and stacks
 void Game::clearStack(Stack* stack) {

@@ -21,7 +21,6 @@ ostream& Cluster::print(ostream& out) const{
 void Cluster::shoop(char val){
     int value =  val-'0';
     for(int m = 0;m<n;m++){
-        cout << type;
         sq[m]->turnOff(value);
     }
 }

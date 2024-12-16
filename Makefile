@@ -1,5 +1,5 @@
 # Define compiler and flags
-CXX = clang++
+CXX = g++ -fsanitize=address -g
 CXXFLAGS = -std=c++17
 
 # Default build type is Release

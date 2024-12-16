@@ -11,11 +11,13 @@
 #include "CanView.hpp"
 #include "Viewer.hpp"
 #include "Frame.hpp"
+#include "streamError.hpp"
 
 class Board: public CanView{
     protected:
         ifstream& puzzle;
         int n;
+        char type;
         Square* bd;
         short emptySquares;
         Square& sub(int r, int c) const {return bd[n*(r-1)+(c-1)];}
@@ -24,12 +26,11 @@ class Board: public CanView{
         void makeClusters();
         void createRow(short j);
         void createColumn(short k);
-        void createBox(short j, short k);
         void shoopBoard();
         //helper function to get valid value input
         char getValidValInput();
         vector<int> getSudukoIndex();
-        
+        Square& operator()(int row, int col) const {return bd[n * (row - 1) + (col - 1)];}
     public:
         Board(char gameType, ifstream& puzzFile);
         ~Board(){delete[] bd; Logger::getStream()<<"Board Destructed"<<'\n';}
@@ -40,7 +41,8 @@ class Board: public CanView{
         Frame* move();
         void restore(Frame* frame);
         Frame* turnOffPoss();
-        // Square& operator()(int row, int col) const {return bd[n * (row - 1) + (col - 1)];}
+        void save();
+        void restoreFromSave();
 };
 
 inline ostream& operator<< (ostream& out, const Board& b) { 

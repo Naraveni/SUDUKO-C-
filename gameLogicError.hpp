@@ -1,25 +1,23 @@
-#ifndef __STREAMERROR__H__
-#define __STREAMERROR__H__
-#include "logger.hpp"
-
+#ifndef __GAMELOGICERROR__H__
+#define __GAMELOGICERROR__H__
 class GameLogicError {
     public:
         virtual void print(){
-            Logger::getStream() <<  "\n\nA Game Logic Error Has Occured\n\n";
+            cout <<  "\n\nA Game Logic Error Has Occured\n\n";
         }
 };
 
 class StateNotEmpty: public GameLogicError{
     public:
         void print(){
-            Logger::getStream() <<  "\n\nAttempt To Insert Value Failed, Square has an already a value fixed\n\n";
+            cout <<  "\n\nAttempt To Insert Value Failed, Square has an already a value fixed\n\n";
         }
 };
 
 class ValueNotPossible: public GameLogicError{
     public:
         void print(){
-            Logger::getStream() <<  "\n\nAttempt To Insert Value Failed, Attempted Value Is Not Possible In This Square\n\n";
+            cout <<  "\n\nAttempt To Insert Value Failed, Attempted Value Is Not Possible In This Square\n\n";
         }
 };
 
@@ -43,4 +41,11 @@ class RedoOperationRestricted: public GameLogicError{
             cout << "\n\n Redo Operation Cannot Be Performed At This Stage\n\n";
         }
 };
-#endif  //!__STREAMERROR__H__
+class SaveFileCorrupted: public GameLogicError{
+    public:
+        void print(){
+            cout << "\n\n Save File Corrupted\n\n";
+        }
+};
+
+#endif

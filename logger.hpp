@@ -7,7 +7,7 @@ class Logger{
     private:
         ofstream outPutFile;
         Logger(){
-            outPutFile.open("output2.txt", ios_base::app); 
+            outPutFile.open("output.txt", ios_base::app); 
         }
         ~Logger(){
             if(outPutFile.is_open()){

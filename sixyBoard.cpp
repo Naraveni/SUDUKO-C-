@@ -1,25 +1,26 @@
 #include "sixyBoard.hpp"
-
+//constructor
 SixyBoard::SixyBoard(ifstream& puzzFile): Board('s', puzzFile){
-    for (short rowStart = 1; rowStart <= 6; rowStart += 3) {  // Loop through rowStart for HBoxes
-            for (short colStart = 1; colStart <= 6; colStart += 3) {  // Loop through colStart for HBoxes
-            short rowEnd = rowStart + 2; // Each HBox spans 3 rows
-            short colEnd = colStart + 2; // Each HBox spans 3 columns
-            createHbox(rowStart, colStart, rowEnd, colEnd);  // Create HBox
+    for (short rowStart = 1; rowStart <= 6; rowStart += 2) { 
+        for (short colStart = 1; colStart <= 6; colStart += 3) {
+            short rowEnd = rowStart + 1; 
+            short colEnd = colStart + 2;
+            createHbox(rowStart, colStart, rowEnd, colEnd); 
         }
     }
-    // Loop to create all VBoxes
-        for (short colStart = 1; colStart <= 6; colStart += 3) {  // Loop through colStart for VBoxes
-            for (short rowStart = 1; rowStart <= 6; rowStart += 3) {  // Loop through rowStart for VBoxes
-                short rowEnd = rowStart + 2; // Each VBox spans 3 rows
-                short colEnd = colStart + 2; // Each VBox spans 3 columns
-                createVbox(rowStart, colStart, rowEnd, colEnd);  // Create VBox
-            }
+    for (short colStart = 1; colStart <= 6; colStart += 2) {
+        for (short rowStart = 1; rowStart <= 6; rowStart += 3) {
+            short rowEnd = rowStart + 2;
+            short colEnd = colStart + 1;
+            createVbox(rowStart, colStart, rowEnd, colEnd);
         }
+    }
     sixyTurnOff();
+    //shooping the board
     shoopBoard();
 }
 
+//creates horizontal boxes
 void SixyBoard::createHbox(short rowStart, short colStart, short rowEnd, short colEnd){
     Square* hBoxSquares[9];
     short index = 0;
@@ -34,6 +35,7 @@ void SixyBoard::createHbox(short rowStart, short colStart, short rowEnd, short c
     clstrs.push_back(hBoxCluster);
 }
 
+//creates vertical boxes
 void SixyBoard::createVbox(short rowStart, short colStart, short rowEnd, short colEnd) {
     // This function creates a vertical box (VBox) from the start to end indices
     Square* vBoxSquares[9];
@@ -49,7 +51,7 @@ void SixyBoard::createVbox(short rowStart, short colStart, short rowEnd, short c
     clstrs.push_back(vBoxCluster);
 }
 
-
+//turnoffs possibilities of 7,8 and 9 for sixy board
 void SixyBoard::sixyTurnOff(){
     for(int m =0 ;m <(n*n); m++){
         bd[m].turnOff(7);

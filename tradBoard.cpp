@@ -1,5 +1,5 @@
 #include "tradBoard.hpp"
-
+//creates boxes
 void TradBoard::createAllBoxes() {
         for (short rowStart = 0; rowStart < n; rowStart += 3) {
             for (short colStart = 0; colStart < n; colStart += 3) {
@@ -7,7 +7,7 @@ void TradBoard::createAllBoxes() {
             }
         }
     }
-
+//creates the box and adds it to the cluster
 void TradBoard::createBox(short rowStart, short colStart) {
         Square* boxSquares[n];
         short index = 0;
@@ -17,6 +17,5 @@ void TradBoard::createBox(short rowStart, short colStart) {
             }
         }
         Cluster* boxCluster = new Cluster(boxSquares, ClusterT::BOX);
-        cout << "Cluster Pushed";
         clstrs.push_back(boxCluster);
     }

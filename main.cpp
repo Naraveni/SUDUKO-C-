@@ -29,8 +29,8 @@ int main(int argc, char *argv[]){
         catch(InputFileNotFoundError e){
             e.print();
         }
-        
-        
+        Game game(inputFile);
+        game.run();
         // State state;
         // testState(state);
 
@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
         // testSquare(square);
         
         // testBoard(inputFile);
-        testErrorHandlers(inputFile);
+        //testErrorHandlers(inputFile);
         // testCluster(inputFile);
         
         bye();
@@ -48,7 +48,6 @@ int main(int argc, char *argv[]){
     catch(exception e){
         fatal(e.what());
     }
-    
 }
 
 // function for unit tests

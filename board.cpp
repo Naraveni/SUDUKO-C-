@@ -9,7 +9,7 @@ void Board::getPuzzle(){
             puzzle >> c;
             if ((c!='-') && (c<'1' || c>ch)){ 
                 throw InvalidInputFile();};
-            sub(m,k) = Square(c,m,k);
+            (*this)(m,k) = Square(c,m,k);
         }
         puzzle.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
@@ -19,7 +19,7 @@ void Board::getPuzzle(){
 }
 
 //constructor
-Board::Board(char gameType, ifstream& puzzFile):puzzle(puzzFile){
+Board::Board(char gameType, ifstream& puzzFile):puzzle(puzzFile) ,type(gameType){
     try{
         Logger::getStream()<< "Contructing The Board"<<'\n';
         if(gameType == 't' || gameType == 'd'){
@@ -40,7 +40,6 @@ Board::Board(char gameType, ifstream& puzzFile):puzzle(puzzFile){
     getPuzzle();
     makeClusters();
     Logger::getStream()<< "Board Construction Done"<<'\n';
-    
 }
 
 //printing all clusters from the board
@@ -59,18 +58,13 @@ void Board::makeClusters(){
     for (short m = 1; m <= n; ++m){
         createColumn(m);
     }
-    // for (short m = 0;  m< n; m += 3) {
-    //     for (short j = 0; j < n; j += 3) {
-    //         createBox(m, j);
-    //     }
-    // }
 }
 
 //creating row cluster
 void Board::createRow(short j) {
     Square* rowSquares[n];
     for (short m = 1; m <= n; ++m) {
-        rowSquares[m-1] = &sub(j,m);
+        rowSquares[m-1] = &(*this)(j,m);
     }
     Cluster* rowCluster = new Cluster(rowSquares, ClusterT::ROW,n);
     clstrs.push_back(rowCluster);
@@ -80,24 +74,11 @@ void Board::createRow(short j) {
 void Board::createColumn(short k) {
     Square* columnSquares[n];
     for (short m = 1; m <= n; ++m) {
-        columnSquares[m-1] = &sub(m,k);
+        columnSquares[m-1] = &(*this)(m,k);
     }
     Cluster* columnCluster = new Cluster(columnSquares,ClusterT::COLUMN,n);
     clstrs.push_back(columnCluster);
 }
-
-//creating box cluster
-// void Board::createBox(short rowStart, short colStart) {
-//     Square* boxSquares[n];
-//     short index = 0;
-//     for (short i = 1; i <= 3; ++i) {
-//         for (short j = 1; j <= 3; ++j) {
-//             boxSquares[index++] = &sub(rowStart+i,colStart+j);
-//         }
-//     }
-//     Cluster* boxCluster = new Cluster(boxSquares, ClusterT::BOX);
-//     clstrs.push_back(boxCluster);
-// }
 
 //Shoops the entire board
 void Board::shoopBoard(){
@@ -105,7 +86,7 @@ void Board::shoopBoard(){
     char ch = '0' + n;
     for(int k = 1; k<=n; k++){
         for(int m =1; m<=n; m++){
-            s = sub(k,m);
+            s = (*this)(k,m);
             char val =  s.getValue();
             //shooping only for non empty states
             if(val>='1' && val<=ch){
@@ -117,13 +98,13 @@ void Board::shoopBoard(){
 
 //return the value of square at the requested index
 char Board::getMarkChar(int r, int c) const{
-    Square s = sub(r,c);
+    Square s = (*this)(r,c);
     return s.getValue();
 }
 
 //returns possibility string of the square at the requested index
 string Board::getPossibilityString(int r, int c) const{
-    short poss = sub(r, c).getPoss();
+    short poss = (*this)(r, c).getPoss();
     string possibilty = "";
     for(int m = 9; m>=1 ; m--){
         possibilty = possibilty + ((((poss >> m & 1)) ? (char)(48+m) : '-'));
@@ -131,10 +112,8 @@ string Board::getPossibilityString(int r, int c) const{
     return possibilty;
 }
 
-
 //performs a board move (marking the squares)
 Frame* Board::move() {
-    string index;
     char val;
     Frame* frame;
     vector<int> rowCol;
@@ -143,17 +122,15 @@ Frame* Board::move() {
         try {
             // Input Value
             val = getValidValInput();
-            sub(rowCol[0], rowCol[1]).mark(val);
+            (*this)(rowCol[0], rowCol[1]).mark(val);
             break;
         } 
         catch (StateNotEmpty& e) {
             e.print();
-            cout << "\n\nThe selected cell is already fixed\n\n";
             return nullptr;
         } 
         catch (ValueNotPossible& e) {
             e.print();
-            cout << "\n\nThe entered value is not possible in this cell. Please try again.\n\n";
             return nullptr;
         }
     }
@@ -164,7 +141,6 @@ Frame* Board::move() {
 //restores the board to the supplied frame state
 void Board::restore(Frame* frame){
     for(int x=0; x<(n*n); x++){
-        cout << frame->getStateAtI(x).getValue()<<endl;
         bd[x].updateState(frame->getStateAtI(x));
     }
 }
@@ -176,7 +152,7 @@ Frame* Board::turnOffPoss(){
     vector<int> rowCol;
     rowCol = getSudukoIndex();
     val = getValidValInput();
-    sub(rowCol[0], rowCol[1]).turnOff(val-'0');
+    (*this)(rowCol[0], rowCol[1]).turnOff(val-'0');
     frame = new Frame(bd);
     return frame;
 }
@@ -221,4 +197,73 @@ vector<int> Board::getSudukoIndex(){
         }
     }
     return rowCol;
+}
+
+void Board::save(){
+    ofstream outFile("sudoku_board.txt");
+    outFile << type << '\n';
+    // Loop through the board to print its state
+    for (int row = 1; row <= n; ++row) {
+        for (int col = 1; col <= n; ++col) {
+            Square& square = (*this)(row, col);  // Get the square at (row, col)
+            char value = square.getValue();      // Get the value of the square
+            // If the value is not empty, print it; otherwise, print '-'
+            outFile << (value != '0' ? value : '-');
+        }
+        outFile << '\n';  // End of row
+    }
+    // Close the file
+    outFile.close();
+    cout << "Board state saved to sudoku_board.txt" << '\n';
+}
+
+void Board::restoreFromSave() {
+    try {
+        std::ifstream inputFile("sudoku_board.txt");
+        if (!inputFile) {
+            throw SaveFileError();
+        }
+        char boardType;
+        inputFile >> boardType;
+        if (boardType != type) {
+            throw SaveFileCorrupted();
+        }
+        // Dynamically allocate memory for n*n Squares
+        Square* tempSquares = new Square[n * n];
+        int row = 1;
+        string line;
+        getline(inputFile, line);
+        while (getline(inputFile, line)) {
+            if (line.length() != static_cast<size_t>(n)) {
+                delete[] tempSquares;
+                throw SaveFileCorrupted();
+            }
+            for (int col = 1; col <= n; ++col) {
+                char ch = line[col - 1];
+                int index = (row - 1) * n + (col - 1);
+                tempSquares[index] = Square(ch, row, col);
+            }
+            ++row;
+        }
+        if (row != n + 1) {
+            delete[] tempSquares; // Cleanup before throwing
+            throw SaveFileCorrupted();
+        }
+        // Create a Frame using the dynamically allocated Square array
+        Frame* frame = new Frame(tempSquares);
+        // Use the restore function with the created frame
+        restore(frame);
+        delete frame;
+        delete[] tempSquares;
+        cout << "Game state restored from file: sudoku_board.txt" << std::endl;
+        shoopBoard();
+    }
+    catch (SaveFileError& e) {
+        e.print();
+        return;
+    }
+    catch (SaveFileCorrupted& e) {
+        e.print();
+        return;
+    }
 }

@@ -32,10 +32,9 @@ class Game{
         }
         void run();
 
-        
         //XXXXXXXXXXXXXXXXX
         // The Below Code for testing purposes only will be removed in the future development
         //XXXXXXXXXXXXXXXXX
-        Board* getBoard() {return board;}
+        const Board* getBoard() {return board;}
 };
 #endif  //!__GAME__H__
